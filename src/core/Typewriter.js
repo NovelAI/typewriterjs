@@ -31,6 +31,7 @@ class Typewriter {
   }
 
   options = {
+    initialText: '',
     strings: null,
     cursor: '|',
     delay: 'natural',
@@ -45,6 +46,8 @@ class Typewriter {
     stringSplitter: null,
     onCreateTextNode: null,
     onRemoveNode: null,
+    onStringTyped: null,
+    onStringType: null,
   }
 
   constructor(container, options) {
@@ -86,8 +89,14 @@ class Typewriter {
     }
 
     if(this.options.autoStart === true && this.options.strings) {
-      this.typeOutAllStrings().start();
-		}
+      const startTyping = () => {
+        this.typeOutAllStrings(this.options.strings).start();
+      }
+
+      if (this.options.initialText) window.setTimeout(startTyping, 1500);
+      else startTyping();
+
+    }
   }
 
   /**
@@ -106,6 +115,17 @@ class Typewriter {
 
     this.state.elements.cursor.innerHTML = this.options.cursor;
     this.state.elements.container.innerHTML = '';
+
+    // initial text
+    if(this.options.initialText)
+      this.options.initialText.split('').forEach(s => {
+        const textNode = document.createTextNode(s);
+        this.state.elements.wrapper.appendChild(textNode);
+        this.state.visibleNodes.push({
+          type: VISIBLE_NODE_TYPES.TEXT_NODE,
+          node: textNode,
+        });
+      });
 
     this.state.elements.container.appendChild(this.state.elements.wrapper);
     this.state.elements.container.appendChild(this.state.elements.cursor);
@@ -149,6 +169,17 @@ class Typewriter {
   /**
    * Add pause event to queue for ms provided
    *
+   * @return {Typewriter}
+   *
+   * @author Telework Inc. <hello@trytelework.com>
+   */
+  clear = () => {
+    return this.addEventToQueue(EVENT_NAMES.CLEAR_WRAPPER);
+  }
+
+  /**
+   * Add pause event to queue for ms provided
+   *
    * @param {Number} ms Time in ms to pause for
    * @return {Typewriter}
    *
@@ -156,6 +187,22 @@ class Typewriter {
    */
   pauseFor = (ms) => {
     this.addEventToQueue(EVENT_NAMES.PAUSE_FOR, { ms });
+
+    return this;
+  }
+
+  /**
+   * Run a callback after string is
+   * typed out
+   *
+   * @return {Typewriter}
+   *
+   * @author Asad Akbar <asad@asadakbar.com>
+   */
+  afterTypeCallback = cb => {
+    if (cb !== null && typeof cb === 'function') {
+      this.callFunction(cb);
+    }
 
     return this;
   }
@@ -390,6 +437,19 @@ class Typewriter {
       this.addEventToQueue(EVENT_NAMES.TYPE_CHARACTER, { character, node });
     });
 
+    return this;
+  }
+
+  /**
+   * Clear wrapper content immediately.
+   *
+   * @return {Typewriter}
+   *
+   * @author Telework Inc. <hello@trytelework.com>
+   */
+  clearWrapper = () => {
+    this.state.visibleNodes = [];
+    this.state.elements.wrapper.textContent = "";
     return this;
   }
 
@@ -715,6 +775,10 @@ class Typewriter {
         this.state.elements.cursor.innerHTML = currentEvent.eventArgs.cursor;
         break;
       }
+
+      case EVENT_NAMES.CLEAR_WRAPPER:
+        this.clearWrapper();
+        break;
 
       default: {
         break;
