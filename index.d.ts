@@ -32,6 +32,9 @@ declare module "typewriter-effect" {
      * @default false
      */
     loop?: boolean
+    pauseFor?: number
+    initialText?: string
+    initialTextDelay?: number
     /**
      * Whether to autostart typing strings or not. You are required to provide
      * strings option.

@@ -48,6 +48,7 @@ new Typewriter('#typewriter', {
 | Name | Type | Default value | Description |
 | --- | --- | --- | --- |
 | initialText | String | empty string | Prefill the wrapper with a string. |
+| initialTextDelay | number | pauseFor | The delay after which the typing starts when using initialText. |
 | strings | String or Array | null | Strings to type out when using ``autoStart`` option |
 | cursor | String | Pipe character | String value to use as the cursor. |
 | delay | 'natural' or Number | 'natural' | The delay between each key when typing. |

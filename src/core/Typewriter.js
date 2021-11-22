@@ -32,6 +32,7 @@ class Typewriter {
 
   options = {
     initialText: '',
+    initialTextDelay: -1,
     strings: null,
     cursor: '|',
     delay: 'natural',
@@ -93,7 +94,8 @@ class Typewriter {
         this.typeOutAllStrings(this.options.strings).start();
       }
 
-      if (this.options.initialText) window.setTimeout(startTyping, 1500);
+      if (this.options.initialText) window.setTimeout(startTyping,
+        this.options.initialTextDelay < 0 ? this.options.pauseFor : this.options.initialTextDelay);
       else startTyping();
 
     }
